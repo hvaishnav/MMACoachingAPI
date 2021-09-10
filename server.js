@@ -113,6 +113,7 @@ app.get("/api/GetCategoryList", async (req, res) => {
 
 // Add Daily Videos
 app.post("/api/AddDailyVideos", async (req, res) => {
+ 
   try {
     const requestData = req.body;
 
@@ -127,7 +128,7 @@ app.post("/api/AddDailyVideos", async (req, res) => {
       requestData.pcategoryno +
       " :: integer,'" +
       requestData.pdate +
-      "' :: timestamp without time zone," +
+      "' :: timestamp(0)," +
       requestData.pinactive +
       ":: boolean)";
 
