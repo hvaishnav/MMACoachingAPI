@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", async (req, res) => {
-  res.json({ message: "Welcome to MMA application. (10/09/2021)" });
+  res.json({ message: "Welcome to MMA application (10/09/2021)." });
 });
 
 //Registration
@@ -83,7 +83,7 @@ app.post("/api/signIn", async (req, res) => {
   try {
     const requestData = req.body;
     var Query =
-      "Select scsecurity.loginselect('" +
+      "Select * From scsecurity.loginselect('" +
       requestData.p_loginid +
       "':: character varying,'" +
       requestData.p_pwd +
@@ -93,11 +93,11 @@ app.post("/api/signIn", async (req, res) => {
 
     //console.log(Query);
     const result = await dbConPool.query(Query);
-    var strRes = result["rows"][0]["loginselect"];
-    strRes = strRes.replace("(", "");
-    strRes = strRes.replace(")", "");
+    //var strRes = result["rows"][0]["loginselect"];
+    // strRes = strRes.replace("(", "");
+    // strRes = strRes.replace(")", "");
 
-    res.json({ result: JSON.stringify(strRes) });
+    res.json(result["rows"][0]);
   } catch (err) {
     console.error(err.message);
   }
