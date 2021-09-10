@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", async (req, res) => {
-  res.json({ message: "Welcome to MMA application. 2.0" });
+  res.json({ message: "Welcome to MMA application. (10/09/2021)" });
 });
 
 //Registration
