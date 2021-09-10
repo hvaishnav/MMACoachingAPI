@@ -32,7 +32,7 @@ app.post("/api/signUp", async (req, res) => {
     const requestData = req.body;
 
     var queryToRegister =
-      "SELECT scsecurity.createlogin(" +
+      "SELECT * From scsecurity.createlogin(" +
       requestData.p_loginno +
       "::integer,'" +
       requestData.p_loginid +
@@ -46,19 +46,17 @@ app.post("/api/signUp", async (req, res) => {
       requestData.p_phoneno +
       "' :: character varying,'" +
       requestData.p_email +
-      "' :: character varying,'" +
+      "' :: character varying," +
       requestData.p_appguid +
-      "' :: character varying)";
-
+      " :: character varying, '" +
+      requestData.p_createddate +
+      "' :: timestamp(0))";
     const result = await dbConPool.query(queryToRegister);
 
-    var strArr = result["rows"][0]["createlogin"];
-
-    res.json({
-      status: strArr.split("_")[0],
-      message: strArr.split("_")[1],
-    });
-  } catch (err) {}
+    res.json(result["rows"]);
+  } catch (err) {
+    res.json({ status: 0, msg: JSON.stringify(err) });
+  }
 });
 
 // Validate one device login
@@ -79,32 +77,6 @@ app.post("/api/validateDeviceLogin", async (req, res) => {
     res.json({ status: 0, msg: err.message });
   }
 });
-
-// //validate otp
-// app.post("/api/validateOTP", async (req, res) => {
-//   try {
-//     const requestData = req.body;
-//     var Query =
-//       "SELECT scutility.validateotp('" +
-//       +requestData.p_otp +
-//       "':: character varying,'" +
-//       requestData.p_toemail +
-//       "':: character varying)";
-
-//     // console.log(Query);
-//     const result = await dbConPool.query(Query);
-//     var strArr = result["rows"][0]["validateotp"];
-//     // if (strArr.split("_")[0] == 1) {
-//     //     await GenerateAndSendMail(2, requestData.p_toemail, 4);
-//     // }
-//     res.json({
-//       status: strArr.split("_")[0],
-//       message: strArr.split("_")[1],
-//     });
-//   } catch (err) {
-//     console.error(err.message);
-//   }
-// });
 
 //Login
 app.post("/api/signIn", async (req, res) => {
@@ -131,58 +103,70 @@ app.post("/api/signIn", async (req, res) => {
   }
 });
 
-// //Resend OTP
-// app.post("/api/resendOTP", async (req, res) => {
-//   try {
-//     const requestData = req.body;
-//     await GenerateAndSendMail(1, requestData.p_toemail, 4);
+//Get category Detail
+app.get("/api/GetCategoryList", async (req, res) => {
+  var query = "Select * From scmasterdata.categorydetail;";
+  const result = await dbConPool.query(query);
 
-//     res.json({
-//       status: 1,
-//       message: "Check OTP !! Mail sent to :" + requestData.p_toemail,
-//     });
-//   } catch (err) {
-//     console.error(err.message);
-//   }
-// });
+  res.json(result["rows"]);
+});
 
-// //Send Mail
-// async function GenerateAndSendMail(templateNo, toemail, loginNo) {
-//   var queryGenerateMail =
-//     "SELECT scutility.generatemail(" +
-//     "'" +
-//     toemail +
-//     "' :: character varying," +
-//     templateNo +
-//     " :: smallint," +
-//     loginNo +
-//     " :: integer)";
+// Add Daily Videos
+app.post("/api/AddDailyVideos", async (req, res) => {
+  try {
+    const requestData = req.body;
 
-//   const result = await dbConPool.query(queryGenerateMail);
-//   var strRes = result["rows"][0]["generatemail"];
-//   strRes = strRes.replace("(", "");
-//   strRes = strRes.replace(")", "");
+    var queryToRegister =
+      "SELECT * From scmasterdata.adddailyvideo(" +
+      requestData.pdailyvideono +
+      ":: integer, '" +
+      requestData.ptitle +
+      "' :: character varying, '" +
+      requestData.plink +
+      "' :: character varying," +
+      requestData.pcategoryno +
+      " :: integer,'" +
+      requestData.pdate +
+      "' :: timestamp without time zone," +
+      requestData.pinactive +
+      ":: boolean)";
 
-//   var strArr = strRes.split(",");
+    const result = await dbConPool.query(queryToRegister);
 
-//   globals.user = strArr[0];
-//   globals.pass = strArr[1];
+    res.json(result["rows"]);
+  } catch (err) {}
+});
 
-//   var mailOptions = {
-//     from: strArr[0],
-//     to: strArr[7],
-//     subject: strArr[5],
-//     text: strArr[6],
-//   };
+//Get Daily Video based on user
+app.post("/api/GetUserWiseDailyVideo", async (req, res) => {
+  try {
+    const requestData = req.body;
+    var Query =
+      "Select * From scmasterdata.getdailyvideo(" +
+      requestData.pcategoryno +
+      ":: int," +
+      requestData.ploginno +
+      ":: int)";
 
-//   SendNotification.sendMail(mailOptions);
-//   return strRes;
-// }
+    const result = await dbConPool.query(Query);
+    res.json(result["rows"]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+// Get Daily Video list
+app.get("/api/GetDailyVideoList", async (req, res) => {
+  var query = "Select * From scmasterdata.GetAllDailyVideo();";
+  const result = await dbConPool.query(query);
+
+  res.json(result["rows"]);
+});
 
 //GetSettingDetails
 app.get("/api/GetSettingDetails", async (req, res) => {
-  var queryGenerateMail = "Select * From scutility.Setting;";
-  const result = await dbConPool.query(queryGenerateMail);
+  var query = "Select * From scutility.Setting;";
+  const result = await dbConPool.query(query);
 
   res.json(result["rows"][0]);
 });
