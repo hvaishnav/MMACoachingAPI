@@ -1,10 +1,10 @@
 const express = require("express");
-//const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const dbConPool = require("./config/db.config");
 const SendNotification = require("./SendNotification");
 var globals = require("./globalvar");
+
 // request option
 const request = require("request");
 
@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", async (req, res) => {
-  res.json({ message: "Welcome to MMA application (10/09/2021)." });
+  res.json({ message: "Welcome to MMA application." });
 });
 
 //Registration
@@ -50,7 +50,11 @@ app.post("/api/signUp", async (req, res) => {
       requestData.p_appguid +
       " :: character varying, '" +
       requestData.p_createddate +
-      "' :: timestamp(0))";
+      "' :: timestamp(0) ,'" +
+      requestData.p_categoryno +
+      "' :: character varying)";
+
+    // console.log(queryToRegister);
     const result = await dbConPool.query(queryToRegister);
 
     res.json(result["rows"]);
@@ -113,7 +117,6 @@ app.get("/api/GetCategoryList", async (req, res) => {
 
 // Add Daily Videos
 app.post("/api/AddDailyVideos", async (req, res) => {
- 
   try {
     const requestData = req.body;
 
@@ -128,7 +131,7 @@ app.post("/api/AddDailyVideos", async (req, res) => {
       requestData.pcategoryno +
       " :: integer,'" +
       requestData.pdate +
-      "' :: timestamp(0)," +
+      "' :: timestamp without time zone," +
       requestData.pinactive +
       ":: boolean)";
 
