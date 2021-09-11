@@ -109,7 +109,7 @@ app.post("/api/signIn", async (req, res) => {
 
 //Get category Detail
 app.get("/api/GetCategoryList", async (req, res) => {
-  var query = "Select * From scmasterdata.categorydetail;";
+  var query = "Select * From scmasterdata.categorydetail order by categoryname;";
   const result = await dbConPool.query(query);
 
   res.json(result["rows"]);
